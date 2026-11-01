@@ -3,9 +3,14 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white p-6">
 
-                <h1 class="text-2xl font-normal mb-6">
-                    <u>Overzicht Magazijn Jamin</u>
-                </h1>
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-normal">
+                        <u>Overzicht Magazijn Jamin</u>
+                    </h1>
+                    <a href="{{ route('leverancier.index') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded text-sm">
+                        Ga naar Overzicht Leveranciers ➔
+                    </a>
+                </div>
 
                 <table class="w-full border-collapse border border-black text-left text-base">
                     <thead>
@@ -39,6 +44,12 @@
                         @endforeach
                     </tbody>
                 </table>
+
+                <div class="mt-6 flex justify-end">
+                    <a href="{{ route('dashboard') }}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">
+                        Home
+                    </a>
+                </div>
 
             </div>
         </div>
