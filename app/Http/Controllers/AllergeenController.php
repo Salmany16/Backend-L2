@@ -21,17 +21,17 @@ class AllergeenController extends Controller
 
         // Controleren of er allergenen zijn
         $heeftAllergenen = count($allergenen) > 0;
-        $geenAllergenenMelding = "";
+        $geenAllergenenMelding = '';
 
-        if (!$heeftAllergenen) {
-            $geenAllergenenMelding = "In dit product zitten geen stoffen die een allergische reactie kunnen veroorzaken";
+        if (! $heeftAllergenen) {
+            $geenAllergenenMelding = 'In dit product zitten geen stoffen die een allergische reactie kunnen veroorzaken';
         }
 
         return view('allergeen.show', [
             'product' => $product,
             'allergenen' => $allergenen,
             'heeftAllergenen' => $heeftAllergenen,
-            'geenAllergenenMelding' => $geenAllergenenMelding
+            'geenAllergenenMelding' => $geenAllergenenMelding,
         ]);
     }
 }
