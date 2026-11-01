@@ -4,7 +4,7 @@
 -- ******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		Database Jamin is aangemaakt + gebruiken (DROP, CREATE, USE)   	 
+-- 01         13-09-2026     YousufzaiS		Database Jamin is aangemaakt + gebruiken (DROP, CREATE, USE)   	 
 *********************************************************************************/ 
 
 DROP DATABASE IF EXISTS Jamin;
@@ -22,7 +22,7 @@ USE Jamin;
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		CREATE TABLE Product gemaakt (Stamtabel)	 
+-- 01         13-09-2026     YousufzaiS		CREATE TABLE Product gemaakt (Stamtabel)	 
 **********************************************************************************/ 
 CREATE TABLE Product 
 (
@@ -42,7 +42,7 @@ CREATE TABLE Product
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		CREATE TABLE Leverancier gemaakt (Stamtabel)	 
+-- 01         13-09-2026     YousufzaiS		CREATE TABLE Leverancier gemaakt (Stamtabel)	 
 **********************************************************************************/ 
 CREATE TABLE Leverancier 
 (
@@ -64,7 +64,7 @@ CREATE TABLE Leverancier
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		CREATE TABLE Allergeen gemaakt (Stamtabel)	 
+-- 01         13-09-2026     YousufzaiS		CREATE TABLE Allergeen gemaakt (Stamtabel)	 
 **********************************************************************************/ 
 CREATE TABLE Allergeen 
 (
@@ -88,7 +88,7 @@ CREATE TABLE Allergeen
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		CREATE TABLE Magazijn gemaakt met FK naar Product	 
+-- 01         13-09-2026     YousufzaiS		CREATE TABLE Magazijn gemaakt met FK naar Product	 
 **********************************************************************************/ 
 CREATE TABLE Magazijn 
 (
@@ -110,7 +110,7 @@ CREATE TABLE Magazijn
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		CREATE TABLE ProductPerAllergeen gemaakt met FK naar Product en Allergeen	 
+-- 01         13-09-2026     YousufzaiS		CREATE TABLE ProductPerAllergeen gemaakt met FK naar Product en Allergeen	 
 **********************************************************************************/ 
 CREATE TABLE ProductPerAllergeen 
 (
@@ -132,7 +132,7 @@ CREATE TABLE ProductPerAllergeen
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		CREATE TABLE ProductPerLeverancier gemaakt met FK naar Leverancier en Product	 
+-- 01         13-09-2026     YousufzaiS		CREATE TABLE ProductPerLeverancier gemaakt met FK naar Leverancier en Product	 
 **********************************************************************************/ 
 CREATE TABLE ProductPerLeverancier 
 (
@@ -161,7 +161,7 @@ CREATE TABLE ProductPerLeverancier
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		13 rijen gevoegd met insert aan tabel Product 
+-- 01         13-09-2026     YousufzaiS		13 rijen gevoegd met insert aan tabel Product 
 **********************************************************************************/ 
 INSERT INTO Product
 (
@@ -182,7 +182,7 @@ VALUES (1, 'Mintnopjes', '8719587231278', 1, NULL, NOW(6), NOW(6))
       ,(7, 'Witte Muizen', '8719587328256', 1, NULL, NOW(6), NOW(6))
       ,(8, 'Reuzen Slangen', '8719587325641', 1, NULL, NOW(6), NOW(6))
       ,(9, 'Zoute Rijen', '8719587322739', 1, NULL, NOW(6), NOW(6))
-      ,(10, 'Winegums', '8719587327527', 1, NULL, NOW(6), NOW(6))
+      ,(10, 'Winegums', '8719587327527', 0, NULL, NOW(6), NOW(6))
       ,(11, 'Drop Munten', '8719587322345', 1, NULL, NOW(6), NOW(6))
       ,(12, 'Kruis Drop', '8719587322265', 1, NULL, NOW(6), NOW(6))
       ,(13, 'Zoute Ruitjes', '8719587323256', 1, NULL, NOW(6), NOW(6));
@@ -194,7 +194,7 @@ VALUES (1, 'Mintnopjes', '8719587231278', 1, NULL, NOW(6), NOW(6))
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		5 rijen gevoegd met insert aan tabel Leverancier 
+-- 01         13-09-2026     YousufzaiS		5 rijen gevoegd met insert aan tabel Leverancier 
 **********************************************************************************/ 
 INSERT INTO Leverancier
 (
@@ -212,7 +212,8 @@ VALUES (1, 'Venco', 'Bert van Linge', 'L1029384719', '06-28493827', 1, NULL, NOW
       ,(2, 'Astra Sweets', 'Jasper del Monte', 'L1029284315', '06-39398734', 1, NULL, NOW(6), NOW(6))
       ,(3, 'Haribo', 'Sven Stalman', 'L1029324748', '06-24383291', 1, NULL, NOW(6), NOW(6))
       ,(4, 'Basset', 'Joyce Stelterberg', 'L1023845773', '06-48293823', 1, NULL, NOW(6), NOW(6))
-      ,(5, 'De Bron', 'Remco Veenstra', 'L1023857736', '06-34291234', 1, NULL, NOW(6), NOW(6));
+      ,(5, 'De Bron', 'Remco Veenstra', 'L1023857736', '06-34291234', 1, NULL, NOW(6), NOW(6))
+      ,(6, 'Quality Street', 'Johan Nooij', 'L1029234586', '06-23458456', 1, NULL, NOW(6), NOW(6));
 
 
 -- Step : 04.3
@@ -221,7 +222,7 @@ VALUES (1, 'Venco', 'Bert van Linge', 'L1029384719', '06-28493827', 1, NULL, NOW
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		5 rijen gevoegd met insert aan tabel Allergeen 
+-- 01         13-09-2026     YousufzaiS		5 rijen gevoegd met insert aan tabel Allergeen 
 **********************************************************************************/ 
 INSERT INTO Allergeen
 (
@@ -246,7 +247,7 @@ VALUES (1, 'Gluten', 'Dit product bevat gluten', 1, NULL, NOW(6), NOW(6))
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		13 rijen gevoegd met insert aan tabel Magazijn (rij 10 heeft NULL voorraad) 
+-- 01         13-09-2026     YousufzaiS		13 rijen gevoegd met insert aan tabel Magazijn (rij 10 heeft NULL voorraad) 
 **********************************************************************************/ 
 INSERT INTO Magazijn
 (
@@ -280,7 +281,7 @@ VALUES (1, 1, 5.0, 453, 1, NULL, NOW(6), NOW(6))
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		12 rijen gevoegd met insert aan tabel ProductPerAllergeen 
+-- 01         13-09-2026     YousufzaiS		12 rijen gevoegd met insert aan tabel ProductPerAllergeen 
 **********************************************************************************/ 
 INSERT INTO ProductPerAllergeen
 (
@@ -312,7 +313,7 @@ VALUES (1, 1, 2, 1, NULL, NOW(6), NOW(6))
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     KadhimH		17 rijen gevoegd met insert aan tabel ProductPerLeverancier 
+-- 01         13-09-2026     YousufzaiS		17 rijen gevoegd met insert aan tabel ProductPerLeverancier 
 **********************************************************************************/ 
 INSERT INTO ProductPerLeverancier
 (
@@ -344,3 +345,121 @@ VALUES (1, 1, 1, '2024-10-09', 23, '2024-10-16', 1, NULL, NOW(6), NOW(6))
       ,(15, 5, 11, '2024-10-19', 60, '2024-10-26', 1, NULL, NOW(6), NOW(6))
       ,(16, 5, 12, '2024-10-11', 45, NULL, 1, NULL, NOW(6), NOW(6))
       ,(17, 5, 13, '2024-10-12', 23, NULL, 1, NULL, NOW(6), NOW(6));
+
+
+-- ==============================================================================
+-- DEEL 5: STORED PROCEDURES (Opdracht 2)
+-- ==============================================================================
+
+-- Step : 06.1
+/*********************************************************************************
+-- Doel : Stored procedure sp_GetLeveranciersOverzicht
+--        Geeft alle leveranciers terug gesorteerd op aantal verschillende
+--        producten DESC (meeste leveringen bovenaan).
+-- *******************************************************************************
+-- Versie     Datum          Auteur          Omschrijving
+-- ******     **********     **********      **************
+-- 01         29-10-2026     YousufzaiS      sp_GetLeveranciersOverzicht aangemaakt
+**********************************************************************************/
+DELIMITER $$
+
+CREATE PROCEDURE sp_GetLeveranciersOverzicht()
+BEGIN
+    SELECT l.Id,
+           l.Naam,
+           l.ContactPersoon,
+           l.LeverancierNummer,
+           l.Mobiel,
+           COUNT(DISTINCT ppl.ProductId) AS AantalVerschillendeProducten
+    FROM Leverancier l
+    LEFT JOIN ProductPerLeverancier ppl ON l.Id = ppl.LeverancierId
+    GROUP BY l.Id, l.Naam, l.ContactPersoon, l.LeverancierNummer, l.Mobiel
+    ORDER BY AantalVerschillendeProducten DESC;
+END$$
+
+DELIMITER ;
+
+
+-- Step : 06.2
+/*********************************************************************************
+-- Doel : Stored procedure sp_GetGeleverdeProdPerLeverancier
+--        Geeft alle producten die een leverancier heeft geleverd, met voorraad
+--        en datum van laatste levering, gesorteerd op AantalAanwezig DESC.
+-- *******************************************************************************
+-- Versie     Datum          Auteur          Omschrijving
+-- ******     **********     **********      **************
+-- 01         29-10-2026     YousufzaiS      sp_GetGeleverdeProdPerLeverancier aangemaakt
+**********************************************************************************/
+DELIMITER $$
+
+CREATE PROCEDURE sp_GetGeleverdeProdPerLeverancier(IN p_LeverancierId INT)
+BEGIN
+    SELECT p.Id                  AS ProductId,
+           p.Naam                AS ProductNaam,
+           p.IsActief,
+           m.VerpakkingsEenheid,
+           m.AantalAanwezig,
+           MAX(ppl.DatumLevering) AS LaatsteLevering
+    FROM ProductPerLeverancier ppl
+    JOIN Product p ON ppl.ProductId = p.Id
+    LEFT JOIN Magazijn m ON p.Id = m.ProductId
+    WHERE ppl.LeverancierId = p_LeverancierId
+    GROUP BY p.Id, p.Naam, p.IsActief, m.VerpakkingsEenheid, m.AantalAanwezig
+    ORDER BY m.AantalAanwezig DESC;
+END$$
+
+DELIMITER ;
+
+
+-- Step : 06.3
+/*********************************************************************************
+-- Doel : Stored procedure sp_SlaLeveringOp
+--        Voegt een nieuwe levering in ProductPerLeverancier in en werkt
+--        de voorraad in Magazijn bij. Controleert NIET op IsActief hier —
+--        validatie vindt plaats in de applicatielaag vóór aanroep.
+-- *******************************************************************************
+-- Versie     Datum          Auteur          Omschrijving
+-- ******     **********     **********      **************
+-- 01         29-10-2026     YousufzaiS      sp_SlaLeveringOp aangemaakt
+**********************************************************************************/
+DELIMITER $$
+
+CREATE PROCEDURE sp_SlaLeveringOp(
+    IN p_LeverancierId          INT,
+    IN p_ProductId              INT,
+    IN p_Aantal                 INT,
+    IN p_DatumEerstVolgende     DATE
+)
+BEGIN
+    -- Voeg nieuwe leveringsregel in
+    INSERT INTO ProductPerLeverancier
+    (
+         LeverancierId
+        ,ProductId
+        ,DatumLevering
+        ,Aantal
+        ,DatumEerstVolgendeLevering
+        ,IsActief
+        ,DatumAangemaakt
+        ,DatumGewijzigd
+    )
+    VALUES
+    (
+         p_LeverancierId
+        ,p_ProductId
+        ,CURDATE()
+        ,p_Aantal
+        ,p_DatumEerstVolgende
+        ,1
+        ,NOW(6)
+        ,NOW(6)
+    );
+
+    -- Bijwerken van voorraad; gebruik COALESCE zodat NULL als 0 telt
+    UPDATE Magazijn
+    SET AantalAanwezig = COALESCE(AantalAanwezig, 0) + p_Aantal,
+        DatumGewijzigd = NOW(6)
+    WHERE ProductId = p_ProductId;
+END$$
+
+DELIMITER ;
