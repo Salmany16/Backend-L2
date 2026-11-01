@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('magazijn.index')" :active="request()->routeIs('magazijn.*', 'levering.*', 'allergeen.*')">
                         {{ __('Overzicht Magazijn Jamin') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('leverancier.index')" :active="request()->routeIs('leverancier.*')">
+                        {{ __('Overzicht Leveranciers') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -75,6 +78,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('magazijn.index')" :active="request()->routeIs('magazijn.*', 'levering.*', 'allergeen.*')">
                 {{ __('Overzicht Magazijn Jamin') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('leverancier.index')" :active="request()->routeIs('leverancier.*')">
+                {{ __('Overzicht Leveranciers') }}
             </x-responsive-nav-link>
         </div>
 

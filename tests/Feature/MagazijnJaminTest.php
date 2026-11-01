@@ -3,11 +3,20 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Database\Seeders\JaminSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MagazijnJaminTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(JaminSeeder::class);
+    }
+
     /**
      * Test 1: Scherm Overzicht Magazijn Jamin toont producten gesorteerd op Barcode.
      */
@@ -20,7 +29,7 @@ class MagazijnJaminTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Overzicht Magazijn Jamin');
         $response->assertSee('Mintnopjes');
-        $response->assertSee('Winegums');
+        $response->assertDontSee('Winegums'); // Winegums is IsActief=0, niet zichtbaar in magazijn
         $response->assertSee('Zoute Ruitjes');
     }
 
