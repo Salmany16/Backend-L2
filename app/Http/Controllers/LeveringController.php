@@ -32,11 +32,19 @@ class LeveringController extends Controller
 
         // Controleren of er voorraad is
         $heeftVoorraad = true;
-        $geenVoorraadMelding = "";
+        $geenVoorraadMelding = '';
 
-        if (!$magazijn || $magazijn->AantalAanwezig === null || $magazijn->AantalAanwezig == 0) {
+        if (! $magazijn || $magazijn->AantalAanwezig === null || $magazijn->AantalAanwezig == 0) {
             $heeftVoorraad = false;
-            $geenVoorraadMelding = "Er is van dit product op dit moment geen voorraad aanwezig, de verwachte eerstvolgende levering is: 30-04-2023";
+
+            $leveringMetVolgende = $leveringen->whereNotNull('DatumEerstVolgendeLevering')->first()
+                ?? $leveringen->first();
+
+            $datumStr = $leveringMetVolgende?->DatumEerstVolgendeLevering
+                ? date('d-m-Y', strtotime($leveringMetVolgende->DatumEerstVolgendeLevering))
+                : 'onbekend';
+
+            $geenVoorraadMelding = "Er is van dit product op dit moment geen voorraad aanwezig, de verwachte eerstvolgende levering is: {$datumStr}";
         }
 
         return view('levering.show', [
@@ -45,7 +53,7 @@ class LeveringController extends Controller
             'leveringen' => $leveringen,
             'leverancier' => $leverancier,
             'heeftVoorraad' => $heeftVoorraad,
-            'geenVoorraadMelding' => $geenVoorraadMelding
+            'geenVoorraadMelding' => $geenVoorraadMelding,
         ]);
     }
 }

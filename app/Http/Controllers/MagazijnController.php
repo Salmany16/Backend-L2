@@ -23,7 +23,7 @@ class MagazijnController extends Controller
             ->get();
 
         return view('magazijn.index', [
-            'producten' => $producten
+            'producten' => $producten,
         ]);
     }
 }
