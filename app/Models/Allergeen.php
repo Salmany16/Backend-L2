@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
-use PDO;
 
 class Allergeen extends Model
 {
@@ -37,33 +36,20 @@ class Allergeen extends Model
     }
 
     /**
-     * Stored Procedure: sp_GetAllergenenPerProduct via PDO
+     * Stored Procedure: sp_GetAllergenenPerProduct
      */
     public static function getAllergenenVoorProduct(int $productId): array
     {
-        $pdo = DB::connection()->getPdo();
-
-        if (DB::connection()->getDriverName() === 'mysql') {
-            $stmt = $pdo->prepare('CALL sp_GetAllergenenPerProduct(:productId)');
-            $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
-            $stmt->execute();
-            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-            $stmt->closeCursor();
-
-            return $results;
+        if (DB::getDriverName() === 'sqlite') {
+            return DB::select('
+                SELECT a.Naam, a.Omschrijving
+                FROM ProductPerAllergeen ppa
+                JOIN Allergeen a ON ppa.AllergeenId = a.Id
+                WHERE ppa.ProductId = ?
+                ORDER BY a.Naam ASC
+            ', [$productId]);
         }
 
-        // SQLite fallback via PDO prepare
-        $stmt = $pdo->prepare('
-            SELECT a.Naam, a.Omschrijving
-            FROM ProductPerAllergeen ppa
-            JOIN Allergeen a ON ppa.AllergeenId = a.Id
-            WHERE ppa.ProductId = :productId
-            ORDER BY a.Naam ASC
-        ');
-        $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return DB::select('CALL sp_GetAllergenenPerProduct(?)', [$productId]);
     }
 }

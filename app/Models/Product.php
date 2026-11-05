@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
-use PDO;
 
 class Product extends Model
 {
@@ -48,35 +47,24 @@ class Product extends Model
     }
 
     /**
-     * Stored Procedure: sp_GetMagazijnOverzicht via PDO
+     * Stored Procedure: sp_GetMagazijnOverzicht
      */
     public static function getMagazijnOverzicht(): array
     {
-        $pdo = DB::connection()->getPdo();
-
-        if (DB::connection()->getDriverName() === 'mysql') {
-            $stmt = $pdo->prepare('CALL sp_GetMagazijnOverzicht()');
-            $stmt->execute();
-            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-            $stmt->closeCursor();
-
-            return $results;
+        if (DB::getDriverName() === 'sqlite') {
+            return DB::select('
+                SELECT p.Id,
+                       p.Naam,
+                       p.Barcode,
+                       m.VerpakkingsEenheid,
+                       m.AantalAanwezig
+                FROM Product p
+                LEFT JOIN Magazijn m ON p.Id = m.ProductId
+                WHERE p.IsActief = 1
+                ORDER BY p.Barcode ASC
+            ');
         }
 
-        // SQLite fallback via PDO prepare
-        $stmt = $pdo->prepare('
-            SELECT p.Id,
-                   p.Naam,
-                   p.Barcode,
-                   m.VerpakkingsEenheid,
-                   m.AantalAanwezig
-            FROM Product p
-            LEFT JOIN Magazijn m ON p.Id = m.ProductId
-            WHERE p.IsActief = 1
-            ORDER BY p.Barcode ASC
-        ');
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return DB::select('CALL sp_GetMagazijnOverzicht()');
     }
 }
