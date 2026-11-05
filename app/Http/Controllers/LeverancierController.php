@@ -2,22 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Leverancier;
+use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 /**
- * LeverancierController
+ * LeverancierController (Controller in MVC)
  *
- * Handles leverancier overview and delivery registration.
- *
- * NOTE: In a MySQL production environment the SELECT queries below would be
- * encapsulated as stored procedures and called via:
- *   DB::select('CALL sp_GetLeveranciersOverzicht()')
- *   DB::select('CALL sp_GetGeleverdeProdPerLeverancier(?)', [$leverancierId])
- *   DB::statement('CALL sp_SlaLeveringOp(?, ?, ?, ?)', [...])
- *
- * Because this project uses SQLite (which does not support stored procedures),
- * equivalent raw SQL is executed through PDO-style bindings instead.
+ * Coördineert de verzoeken voor het leveranciersoverzicht en levering registraties.
+ * Maakt gebruik van de Models Leverancier en Product voor alle data-opvragingen (OOP & MVC).
  */
 class LeverancierController extends Controller
 {
@@ -26,19 +19,8 @@ class LeverancierController extends Controller
      */
     public function index()
     {
-        // Equivalent of sp_GetLeveranciersOverzicht
-        $leveranciers = DB::select('
-            SELECT l.Id,
-                   l.Naam,
-                   l.ContactPersoon,
-                   l.LeverancierNummer,
-                   l.Mobiel,
-                   COUNT(DISTINCT ppl.ProductId) as AantalVerschillendeProducten
-            FROM Leverancier l
-            LEFT JOIN ProductPerLeverancier ppl ON l.Id = ppl.LeverancierId
-            GROUP BY l.Id, l.Naam, l.ContactPersoon, l.LeverancierNummer, l.Mobiel
-            ORDER BY AantalVerschillendeProducten DESC
-        ');
+        // Model roept de stored procedure / query aan (sp_GetLeveranciersOverzicht)
+        $leveranciers = Leverancier::getOverzicht();
 
         return view('leverancier.index', [
             'leveranciers' => $leveranciers,
@@ -50,24 +32,10 @@ class LeverancierController extends Controller
      */
     public function showProducten(int $leverancierId)
     {
-        $leverancier = DB::table('Leverancier')->where('Id', $leverancierId)->first();
+        $leverancier = Leverancier::findOrFail($leverancierId);
 
-        // Equivalent of sp_GetGeleverdeProdPerLeverancier
-        $producten = DB::select('
-            SELECT p.Id as ProductId,
-                   p.Naam as ProductNaam,
-                   p.IsActief,
-                   m.VerpakkingsEenheid,
-                   m.AantalAanwezig,
-                   MAX(ppl.DatumLevering) as LaatsteLevering
-            FROM ProductPerLeverancier ppl
-            JOIN Product p ON ppl.ProductId = p.Id
-            LEFT JOIN Magazijn m ON p.Id = m.ProductId
-            WHERE ppl.LeverancierId = ?
-            GROUP BY p.Id, p.Naam, p.IsActief, m.VerpakkingsEenheid, m.AantalAanwezig
-            ORDER BY m.AantalAanwezig DESC
-        ', [$leverancierId]);
-
+        // Model roept de stored procedure / query aan (sp_GetGeleverdeProdPerLeverancier)
+        $producten = Leverancier::getGeleverdeProducten($leverancierId);
         $heeftProducten = count($producten) > 0;
 
         return view('leverancier.producten', [
@@ -82,8 +50,8 @@ class LeverancierController extends Controller
      */
     public function showLeveringForm(int $leverancierId, int $productId)
     {
-        $leverancier = DB::table('Leverancier')->where('Id', $leverancierId)->first();
-        $product = DB::table('Product')->where('Id', $productId)->first();
+        $leverancier = Leverancier::findOrFail($leverancierId);
+        $product = Product::findOrFail($productId);
 
         return view('leverancier.levering-form', [
             'leverancier' => $leverancier,
@@ -93,8 +61,7 @@ class LeverancierController extends Controller
     }
 
     /**
-     * POST handler: Sla een nieuwe levering op.
-     * Equivalent of sp_SlaLeveringOp in MySQL.
+     * POST handler: Sla een nieuwe levering op via het Model.
      */
     public function slaLeveringOp(Request $request, int $leverancierId, int $productId)
     {
@@ -103,11 +70,11 @@ class LeverancierController extends Controller
             'datum_eerstvolgende' => ['required', 'date'],
         ]);
 
-        $leverancier = DB::table('Leverancier')->where('Id', $leverancierId)->first();
-        $product = DB::table('Product')->where('Id', $productId)->first();
+        $leverancier = Leverancier::findOrFail($leverancierId);
+        $product = Product::findOrFail($productId);
 
-        // Controleer of product actief is
-        if ((int) $product->IsActief === 0) {
+        // Controleer of product actief is (User Story 02 - Scenario 02)
+        if (! $product->IsActief) {
             $errorMelding = "Het product {$product->Naam} van de leverancier {$leverancier->Naam} wordt niet meer geproduceerd";
 
             return view('leverancier.levering-form', [
@@ -119,20 +86,9 @@ class LeverancierController extends Controller
 
         $aantal = (int) $request->input('aantal');
         $datumEerstVolgende = $request->input('datum_eerstvolgende');
-        $datumLevering = now()->toDateString();
 
-        // Voeg nieuwe leveringsregel in
-        DB::insert(
-            'INSERT INTO ProductPerLeverancier (LeverancierId, ProductId, DatumLevering, Aantal, DatumEerstVolgendeLevering, IsActief, DatumAangemaakt, DatumGewijzigd)
-             VALUES (?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-            [$leverancierId, $productId, $datumLevering, $aantal, $datumEerstVolgende]
-        );
-
-        // Bijwerken van voorraad in Magazijn
-        DB::update(
-            'UPDATE Magazijn SET AantalAanwezig = COALESCE(AantalAanwezig, 0) + ?, DatumGewijzigd = CURRENT_TIMESTAMP WHERE ProductId = ?',
-            [$aantal, $productId]
-        );
+        // Model voert de database-transactie uit (sp_SlaLeveringOp)
+        Leverancier::slaLeveringOp($leverancierId, $productId, $aantal, $datumEerstVolgende);
 
         return redirect()->route('leverancier.producten', $leverancierId);
     }
