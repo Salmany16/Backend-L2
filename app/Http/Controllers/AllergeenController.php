@@ -9,18 +9,13 @@ class AllergeenController extends Controller
 {
     public function show($productId)
     {
-        // Product ophalen via het Model Product (MVC & OOP)
+        // Product ophalen via Model Product
         $product = Product::findOrFail($productId);
 
-        // Allergenen ophalen via het Model Allergeen en koppeltabel relatie
-        $allergenen = Allergeen::whereHas('productPerAllergenen', function ($query) use ($productId) {
-            $query->where('ProductId', $productId);
-        })
-            ->orderBy('Naam', 'asc')
-            ->get();
+        // Allergenen ophalen via Stored Procedure sp_GetAllergenenPerProduct (via Model Allergeen en PDO)
+        $allergenen = Allergeen::getAllergenenVoorProduct((int) $productId);
 
-        // Controleren of er allergenen zijn
-        $heeftAllergenen = $allergenen->isNotEmpty();
+        $heeftAllergenen = count($allergenen) > 0;
         $geenAllergenenMelding = '';
 
         if (! $heeftAllergenen) {

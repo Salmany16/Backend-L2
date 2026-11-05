@@ -463,3 +463,89 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+-- ==============================================================================
+-- DEEL 6: STORED PROCEDURES (Opdracht 1: Magazijn, Levering & Allergeen)
+-- ==============================================================================
+
+-- Step : 07.1
+/*********************************************************************************
+-- Doel : Stored procedure sp_GetMagazijnOverzicht
+--        Haalt alle actieve producten op met voorraad gesorteerd op Barcode ASC.
+-- *******************************************************************************
+-- Versie     Datum          Auteur          Omschrijving
+-- ******     **********     **********      **************
+-- 01         05-11-2026     YousufzaiS      sp_GetMagazijnOverzicht aangemaakt
+**********************************************************************************/
+DELIMITER $$
+
+CREATE PROCEDURE sp_GetMagazijnOverzicht()
+BEGIN
+    SELECT p.Id,
+           p.Naam,
+           p.Barcode,
+           m.VerpakkingsEenheid,
+           m.AantalAanwezig
+    FROM Product p
+    LEFT JOIN Magazijn m ON p.Id = m.ProductId
+    WHERE p.IsActief = 1
+    ORDER BY p.Barcode ASC;
+END$$
+
+DELIMITER ;
+
+
+-- Step : 07.2
+/*********************************************************************************
+-- Doel : Stored procedure sp_GetLeveringDetails
+--        Haalt leveringen en leveranciergegevens op voor een specifiek product.
+-- *******************************************************************************
+-- Versie     Datum          Auteur          Omschrijving
+-- ******     **********     **********      **************
+-- 01         05-11-2026     YousufzaiS      sp_GetLeveringDetails aangemaakt
+**********************************************************************************/
+DELIMITER $$
+
+CREATE PROCEDURE sp_GetLeveringDetails(IN p_ProductId INT)
+BEGIN
+    SELECT ppl.Id,
+           ppl.LeverancierId,
+           ppl.ProductId,
+           ppl.DatumLevering,
+           ppl.Aantal,
+           ppl.DatumEerstVolgendeLevering,
+           l.Naam AS LeverancierNaam,
+           l.ContactPersoon,
+           l.LeverancierNummer,
+           l.Mobiel
+    FROM ProductPerLeverancier ppl
+    JOIN Leverancier l ON ppl.LeverancierId = l.Id
+    WHERE ppl.ProductId = p_ProductId
+    ORDER BY ppl.DatumLevering ASC;
+END$$
+
+DELIMITER ;
+
+
+-- Step : 07.3
+/*********************************************************************************
+-- Doel : Stored procedure sp_GetAllergenenPerProduct
+--        Haalt alle allergenen op voor een specifiek product gesorteerd op Naam.
+-- *******************************************************************************
+-- Versie     Datum          Auteur          Omschrijving
+-- ******     **********     **********      **************
+-- 01         05-11-2026     YousufzaiS      sp_GetAllergenenPerProduct aangemaakt
+**********************************************************************************/
+DELIMITER $$
+
+CREATE PROCEDURE sp_GetAllergenenPerProduct(IN p_ProductId INT)
+BEGIN
+    SELECT a.Naam, a.Omschrijving
+    FROM ProductPerAllergeen ppa
+    JOIN Allergeen a ON ppa.AllergeenId = a.Id
+    WHERE ppa.ProductId = p_ProductId
+    ORDER BY a.Naam ASC;
+END$$
+
+DELIMITER ;

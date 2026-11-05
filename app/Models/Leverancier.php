@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use PDO;
 
 class Leverancier extends Model
 {
@@ -38,72 +39,110 @@ class Leverancier extends Model
     }
 
     /**
-     * Haalt overzicht op van leveranciers met aantal verschillende producten via Eloquent Models.
+     * Stored Procedure: sp_GetLeveranciersOverzicht
+     * Uitgevoerd via PDO (Verplicht voor Opdracht 2)
      */
-    public static function getOverzicht(): Collection
+    public static function getOverzicht(): array
     {
-        return self::with('productPerLeveranciers')
-            ->get()
-            ->map(function ($leverancier) {
-                return (object) [
-                    'Id' => $leverancier->Id,
-                    'Naam' => $leverancier->Naam,
-                    'ContactPersoon' => $leverancier->ContactPersoon,
-                    'LeverancierNummer' => $leverancier->LeverancierNummer,
-                    'Mobiel' => $leverancier->Mobiel,
-                    'AantalVerschillendeProducten' => $leverancier->productPerLeveranciers->pluck('ProductId')->unique()->count(),
-                ];
-            })
-            ->sortByDesc('AantalVerschillendeProducten')
-            ->values();
+        $pdo = DB::connection()->getPdo();
+
+        if (DB::connection()->getDriverName() === 'mysql') {
+            $stmt = $pdo->prepare('CALL sp_GetLeveranciersOverzicht()');
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $stmt->closeCursor();
+
+            return $results;
+        }
+
+        // SQLite fallback via PDO prepare
+        $stmt = $pdo->prepare('
+            SELECT l.Id,
+                   l.Naam,
+                   l.ContactPersoon,
+                   l.LeverancierNummer,
+                   l.Mobiel,
+                   COUNT(DISTINCT ppl.ProductId) as AantalVerschillendeProducten
+            FROM Leverancier l
+            LEFT JOIN ProductPerLeverancier ppl ON l.Id = ppl.LeverancierId
+            GROUP BY l.Id, l.Naam, l.ContactPersoon, l.LeverancierNummer, l.Mobiel
+            ORDER BY AantalVerschillendeProducten DESC
+        ');
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     /**
-     * Haalt de geleverde producten per leverancier op via Eloquent Models.
+     * Stored Procedure: sp_GetGeleverdeProdPerLeverancier
+     * Uitgevoerd via PDO (Verplicht voor Opdracht 2)
      */
-    public static function getGeleverdeProducten(int $leverancierId): Collection
+    public static function getGeleverdeProducten(int $leverancierId): array
     {
-        $leveringen = ProductPerLeverancier::with(['product.magazijn'])
-            ->where('LeverancierId', $leverancierId)
-            ->get();
+        $pdo = DB::connection()->getPdo();
 
-        return $leveringen->groupBy('ProductId')
-            ->map(function ($groep) {
-                $eerste = $groep->first();
-                $product = $eerste->product;
-                $magazijn = $product?->magazijn;
+        if (DB::connection()->getDriverName() === 'mysql') {
+            $stmt = $pdo->prepare('CALL sp_GetGeleverdeProdPerLeverancier(:leverancierId)');
+            $stmt->bindValue(':leverancierId', $leverancierId, PDO::PARAM_INT);
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $stmt->closeCursor();
 
-                return (object) [
-                    'ProductId' => $product?->Id,
-                    'ProductNaam' => $product?->Naam,
-                    'IsActief' => (bool) $product?->IsActief,
-                    'VerpakkingsEenheid' => $magazijn?->VerpakkingsEenheid,
-                    'AantalAanwezig' => $magazijn?->AantalAanwezig,
-                    'LaatsteLevering' => $groep->max('DatumLevering'),
-                ];
-            })
-            ->sortByDesc('AantalAanwezig')
-            ->values();
+            return $results;
+        }
+
+        // SQLite fallback via PDO prepare
+        $stmt = $pdo->prepare('
+            SELECT p.Id as ProductId,
+                   p.Naam as ProductNaam,
+                   p.IsActief,
+                   m.VerpakkingsEenheid,
+                   m.AantalAanwezig,
+                   MAX(ppl.DatumLevering) as LaatsteLevering
+            FROM ProductPerLeverancier ppl
+            JOIN Product p ON ppl.ProductId = p.Id
+            LEFT JOIN Magazijn m ON p.Id = m.ProductId
+            WHERE ppl.LeverancierId = :leverancierId
+            GROUP BY p.Id, p.Naam, p.IsActief, m.VerpakkingsEenheid, m.AantalAanwezig
+            ORDER BY m.AantalAanwezig DESC
+        ');
+        $stmt->bindValue(':leverancierId', $leverancierId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     /**
-     * Voegt een nieuwe levering toe en hoogt de magazijnvoorraad op via Eloquent Models.
+     * Stored Procedure: sp_SlaLeveringOp
+     * Uitgevoerd via PDO (Verplicht voor Opdracht 2)
      */
     public static function slaLeveringOp(int $leverancierId, int $productId, int $aantal, string $datumEerstVolgende): void
     {
-        ProductPerLeverancier::create([
-            'LeverancierId' => $leverancierId,
-            'ProductId' => $productId,
-            'DatumLevering' => now()->toDateString(),
-            'Aantal' => $aantal,
-            'DatumEerstVolgendeLevering' => $datumEerstVolgende,
-            'IsActief' => true,
-        ]);
+        $pdo = DB::connection()->getPdo();
 
-        $magazijn = Magazijn::where('ProductId', $productId)->first();
-        if ($magazijn) {
-            $magazijn->AantalAanwezig = ($magazijn->AantalAanwezig ?? 0) + $aantal;
-            $magazijn->save();
+        if (DB::connection()->getDriverName() === 'mysql') {
+            $stmt = $pdo->prepare('CALL sp_SlaLeveringOp(:leverancierId, :productId, :aantal, :datumEerstVolgende)');
+            $stmt->bindValue(':leverancierId', $leverancierId, PDO::PARAM_INT);
+            $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
+            $stmt->bindValue(':aantal', $aantal, PDO::PARAM_INT);
+            $stmt->bindValue(':datumEerstVolgende', $datumEerstVolgende, PDO::PARAM_STR);
+            $stmt->execute();
+            $stmt->closeCursor();
+
+            return;
         }
+
+        // SQLite fallback via PDO prepare
+        $datumLevering = now()->toDateString();
+        $stmt1 = $pdo->prepare('
+            INSERT INTO ProductPerLeverancier (LeverancierId, ProductId, DatumLevering, Aantal, DatumEerstVolgendeLevering, IsActief, DatumAangemaakt, DatumGewijzigd)
+            VALUES (?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ');
+        $stmt1->execute([$leverancierId, $productId, $datumLevering, $aantal, $datumEerstVolgende]);
+
+        $stmt2 = $pdo->prepare('
+            UPDATE Magazijn SET AantalAanwezig = COALESCE(AantalAanwezig, 0) + ?, DatumGewijzigd = CURRENT_TIMESTAMP WHERE ProductId = ?
+        ');
+        $stmt2->execute([$aantal, $productId]);
     }
 }

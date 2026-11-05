@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
+use PDO;
 
 class Levering extends Model
 {
@@ -46,6 +48,46 @@ class Levering extends Model
     }
 
     /**
+     * Stored Procedure: sp_GetLeveringDetails via PDO
+     */
+    public static function getLeveringDetails(int $productId): array
+    {
+        $pdo = DB::connection()->getPdo();
+
+        if (DB::connection()->getDriverName() === 'mysql') {
+            $stmt = $pdo->prepare('CALL sp_GetLeveringDetails(:productId)');
+            $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $stmt->closeCursor();
+
+            return $results;
+        }
+
+        // SQLite fallback via PDO prepare
+        $stmt = $pdo->prepare('
+            SELECT ppl.Id,
+                   ppl.LeverancierId,
+                   ppl.ProductId,
+                   ppl.DatumLevering,
+                   ppl.Aantal,
+                   ppl.DatumEerstVolgendeLevering,
+                   l.Naam AS LeverancierNaam,
+                   l.ContactPersoon,
+                   l.LeverancierNummer,
+                   l.Mobiel
+            FROM ProductPerLeverancier ppl
+            JOIN Leverancier l ON ppl.LeverancierId = l.Id
+            WHERE ppl.ProductId = :productId
+            ORDER BY ppl.DatumLevering ASC
+        ');
+        $stmt->bindValue(':productId', $productId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
      * Haalt de details op van een product en leverancier voor het leveringsformulier (Wireframe-04).
      */
     public static function getProductLeveringDetails(int $leverancierId, int $productId): ?object
@@ -69,23 +111,11 @@ class Levering extends Model
     }
 
     /**
+     * Stored Procedure: sp_SlaLeveringOp via PDO
      * Voegt een nieuwe levering toe en verhoogt het aantal in het magazijn.
      */
     public static function voegLeveringToe(int $leverancierId, int $productId, int $aantal, ?string $datumEerstvolgende = null): void
     {
-        self::create([
-            'LeverancierId' => $leverancierId,
-            'ProductId' => $productId,
-            'DatumLevering' => now()->toDateString(),
-            'Aantal' => $aantal,
-            'DatumEerstVolgendeLevering' => $datumEerstvolgende,
-            'IsActief' => true,
-        ]);
-
-        $magazijn = Magazijn::where('ProductId', $productId)->first();
-        if ($magazijn) {
-            $magazijn->AantalAanwezig = ($magazijn->AantalAanwezig ?? 0) + $aantal;
-            $magazijn->save();
-        }
+        Leverancier::slaLeveringOp($leverancierId, $productId, $aantal, $datumEerstvolgende ?? '');
     }
 }
