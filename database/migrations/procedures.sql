@@ -6,6 +6,9 @@ DROP PROCEDURE IF EXISTS sp_SlaLeveringOp;
 DROP PROCEDURE IF EXISTS sp_GetMagazijnOverzicht;
 DROP PROCEDURE IF EXISTS sp_GetLeveringDetails;
 DROP PROCEDURE IF EXISTS sp_GetAllergenenPerProduct;
+DROP PROCEDURE IF EXISTS sp_GetLeverancierById;
+DROP PROCEDURE IF EXISTS sp_GetProductById;
+DROP PROCEDURE IF EXISTS sp_GetProductLeveringDetails;
 
 DELIMITER //
 
@@ -113,6 +116,37 @@ BEGIN
     JOIN Allergeen a ON ppa.AllergeenId = a.Id
     WHERE ppa.ProductId = p_ProductId
     ORDER BY a.Naam ASC;
+END //
+
+CREATE PROCEDURE sp_GetLeverancierById(IN p_Id INT)
+BEGIN
+    SELECT * FROM Leverancier WHERE Id = p_Id;
+END //
+
+CREATE PROCEDURE sp_GetProductById(IN p_Id INT)
+BEGIN
+    SELECT p.Id,
+           p.Naam,
+           p.Barcode,
+           p.IsActief,
+           m.AantalAanwezig,
+           m.VerpakkingsEenheid
+    FROM Product p
+    LEFT JOIN Magazijn m ON p.Id = m.ProductId
+    WHERE p.Id = p_Id;
+END //
+
+CREATE PROCEDURE sp_GetProductLeveringDetails(IN p_LeverancierId INT, IN p_ProductId INT)
+BEGIN
+    SELECT p.Id AS ProductId,
+           p.Naam AS ProductNaam,
+           p.IsActief AS ProductIsActief,
+           l.Id AS LeverancierId,
+           l.Naam AS LeverancierNaam,
+           l.ContactPersoon,
+           l.Mobiel
+    FROM Product p, Leverancier l
+    WHERE p.Id = p_ProductId AND l.Id = p_LeverancierId;
 END //
 
 DELIMITER ;

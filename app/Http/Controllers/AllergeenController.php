@@ -7,26 +7,19 @@ use App\Models\Product;
 
 class AllergeenController extends Controller
 {
-    public function show($productId)
+    public function show(int $productId)
     {
-        // Product ophalen via Model Product
-        $product = Product::findOrFail($productId);
+        $product = Product::getById($productId);
+        abort_if(! $product, 404);
 
-        // Allergenen ophalen via Stored Procedure sp_GetAllergenenPerProduct (via Model Allergeen en PDO)
-        $allergenen = Allergeen::getAllergenenVoorProduct((int) $productId);
-
+        $allergenen = Allergeen::getAllergenenVoorProduct($productId);
         $heeftAllergenen = count($allergenen) > 0;
-        $geenAllergenenMelding = '';
-
-        if (! $heeftAllergenen) {
-            $geenAllergenenMelding = 'In dit product zitten geen stoffen die een allergische reactie kunnen veroorzaken';
-        }
 
         return view('allergeen.show', [
             'product' => $product,
             'allergenen' => $allergenen,
             'heeftAllergenen' => $heeftAllergenen,
-            'geenAllergenenMelding' => $geenAllergenenMelding,
+            'geenAllergenenMelding' => $heeftAllergenen ? '' : 'In dit product zitten geen stoffen die een allergische reactie kunnen veroorzaken',
         ]);
     }
 }

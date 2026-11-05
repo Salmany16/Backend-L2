@@ -8,36 +8,28 @@ use Illuminate\Http\Request;
 
 class LeveringController extends Controller
 {
-    public function show($productId)
+    public function show(int $productId)
     {
-        // Product en Magazijn voorraad ophalen via Model Product
-        $product = Product::with('magazijn')->findOrFail($productId);
-        $magazijn = $product->magazijn;
+        $product = Product::getById($productId);
+        abort_if(! $product, 404);
 
-        // Leveringen en leverancier ophalen via Stored Procedure sp_GetLeveringDetails (Model Levering & PDO)
-        $leveringen = collect(Levering::getLeveringDetails((int) $productId));
+        $leveringen = collect(Levering::getLeveringDetails($productId));
         $leverancier = $leveringen->first();
 
-        // Controleren of er voorraad is
-        $heeftVoorraad = true;
+        $heeftVoorraad = ! ($product->AantalAanwezig === null || $product->AantalAanwezig == 0);
         $geenVoorraadMelding = '';
 
-        if (! $magazijn || $magazijn->AantalAanwezig === null || $magazijn->AantalAanwezig == 0) {
-            $heeftVoorraad = false;
-
-            $leveringMetVolgende = $leveringen->whereNotNull('DatumEerstVolgendeLevering')->first()
-                ?? $leveringen->first();
-
+        if (! $heeftVoorraad) {
+            $leveringMetVolgende = $leveringen->whereNotNull('DatumEerstVolgendeLevering')->first() ?? $leverancier;
             $datumStr = $leveringMetVolgende?->DatumEerstVolgendeLevering
                 ? date('d-m-Y', strtotime($leveringMetVolgende->DatumEerstVolgendeLevering))
                 : 'onbekend';
-
             $geenVoorraadMelding = "Er is van dit product op dit moment geen voorraad aanwezig, de verwachte eerstvolgende levering is: {$datumStr}";
         }
 
         return view('levering.show', [
             'product' => $product,
-            'magazijn' => $magazijn,
+            'magazijn' => $product,
             'leveringen' => $leveringen,
             'leverancier' => $leverancier,
             'heeftVoorraad' => $heeftVoorraad,
@@ -45,14 +37,9 @@ class LeveringController extends Controller
         ]);
     }
 
-    /**
-     * Detailscherm Levering product (Wireframe-04).
-     */
-    public function create($leverancierId, $productId)
+    public function create(int $leverancierId, int $productId)
     {
-        // Haal product- en leveranciergegevens op via Model Levering (MVC & OOP)
-        $leveringInfo = Levering::getProductLeveringDetails((int) $leverancierId, (int) $productId);
-
+        $leveringInfo = Levering::getProductLeveringDetails($leverancierId, $productId);
         if (! $leveringInfo) {
             return redirect()->route('leverancier.index');
         }
@@ -64,38 +51,29 @@ class LeveringController extends Controller
         ]);
     }
 
-    /**
-     * Verwerkt de levering van een product via Stored Procedure sp_SlaLeveringOp.
-     */
-    public function store(Request $request, $leverancierId, $productId)
+    public function store(Request $request, int $leverancierId, int $productId)
     {
         $request->validate([
             'aantal' => 'required|integer|min:1',
             'datum_eerstvolgende_levering' => 'nullable|date',
         ]);
 
-        $leveringInfo = Levering::getProductLeveringDetails((int) $leverancierId, (int) $productId);
-
+        $leveringInfo = Levering::getProductLeveringDetails($leverancierId, $productId);
         if (! $leveringInfo) {
             return redirect()->route('leverancier.index');
         }
 
-        // Scenario 02: Product is niet actief (Winegums van Basset)
         if (! $leveringInfo->ProductIsActief) {
             return redirect()
                 ->route('levering.create', ['leverancierId' => $leverancierId, 'productId' => $productId])
                 ->with('inactief_melding', "Het product {$leveringInfo->ProductNaam} van de leverancier {$leveringInfo->LeverancierNaam} wordt niet meer geproduceerd");
         }
 
-        // Scenario 01: Product is actief -> toevoegen via Stored Procedure (Model Levering & PDO)
-        $aantal = (int) $request->input('aantal');
-        $datumEerstvolgende = $request->input('datum_eerstvolgende_levering') ?: null;
-
         Levering::voegLeveringToe(
-            (int) $leverancierId,
-            (int) $productId,
-            $aantal,
-            $datumEerstvolgende
+            $leverancierId,
+            $productId,
+            (int) $request->input('aantal'),
+            $request->input('datum_eerstvolgende_levering')
         );
 
         return redirect()->route('leverancier.producten', $leverancierId);
