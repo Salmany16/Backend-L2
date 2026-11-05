@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Allergeen;
+use App\Models\Product;
 
 class AllergeenController extends Controller
 {
     public function show($productId)
     {
-        // Product ophalen
-        $product = DB::table('Product')->where('Id', $productId)->first();
+        // Product ophalen via het Model Product (MVC & OOP)
+        $product = Product::findOrFail($productId);
 
-        // Allergenen ophalen van dit product
-        $allergenen = DB::table('ProductPerAllergeen')
-            ->join('Allergeen', 'ProductPerAllergeen.AllergeenId', '=', 'Allergeen.Id')
-            ->where('ProductPerAllergeen.ProductId', $productId)
-            ->select('Allergeen.Naam', 'Allergeen.Omschrijving')
-            ->orderBy('Allergeen.Naam', 'asc')
+        // Allergenen ophalen via het Model Allergeen en koppeltabel relatie
+        $allergenen = Allergeen::whereHas('productPerAllergenen', function ($query) use ($productId) {
+            $query->where('ProductId', $productId);
+        })
+            ->orderBy('Naam', 'asc')
             ->get();
 
         // Controleren of er allergenen zijn
-        $heeftAllergenen = count($allergenen) > 0;
+        $heeftAllergenen = $allergenen->isNotEmpty();
         $geenAllergenenMelding = '';
 
         if (! $heeftAllergenen) {

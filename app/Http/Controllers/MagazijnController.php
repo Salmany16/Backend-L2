@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Product;
 
 class MagazijnController extends Controller
 {
     public function index()
     {
-        // Haal alle producten op met de magazijn voorraad
-        $producten = DB::table('Product')
-            ->leftJoin('Magazijn', 'Product.Id', '=', 'Magazijn.ProductId')
-            ->select(
-                'Product.Id',
-                'Product.Naam',
-                'Product.Barcode',
-                'Magazijn.VerpakkingsEenheid',
-                'Magazijn.AantalAanwezig'
-            )
-            ->where('Product.IsActief', 1)
-            ->orderBy('Product.Barcode', 'asc')
-            ->get();
+        // Haal alle actieve producten op via het Model Product met de Magazijn relatie (MVC & OOP)
+        $producten = Product::where('IsActief', 1)
+            ->with('magazijn')
+            ->orderBy('Barcode', 'asc')
+            ->get()
+            ->map(function ($product) {
+                return (object) [
+                    'Id' => $product->Id,
+                    'Naam' => $product->Naam,
+                    'Barcode' => $product->Barcode,
+                    'VerpakkingsEenheid' => $product->magazijn?->VerpakkingsEenheid,
+                    'AantalAanwezig' => $product->magazijn?->AantalAanwezig,
+                ];
+            });
 
         return view('magazijn.index', [
             'producten' => $producten,
