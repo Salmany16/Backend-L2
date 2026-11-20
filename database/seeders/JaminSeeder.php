@@ -17,7 +17,18 @@ class JaminSeeder extends Seeder
         DB::table('Magazijn')->delete();
         DB::table('Allergeen')->delete();
         DB::table('Leverancier')->delete();
+        DB::table('Contact')->delete();
         DB::table('Product')->delete();
+
+        // 0. Contact (BE-opdracht 03)
+        DB::table('Contact')->insert([
+            ['Id' => 1, 'Straat' => 'Van Gilslaan', 'Huisnummer' => 34, 'Postcode' => '1045CB', 'Stad' => 'Hilvarenbeek', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 2, 'Straat' => 'Den Dolderpad', 'Huisnummer' => 2, 'Postcode' => '1067RC', 'Stad' => 'Utrecht', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 3, 'Straat' => 'Fredo Raalteweg', 'Huisnummer' => 257, 'Postcode' => '1236OP', 'Stad' => 'Nijmegen', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 4, 'Straat' => 'Bertrand Russellhof', 'Huisnummer' => 21, 'Postcode' => '2034AP', 'Stad' => 'Den Haag', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 5, 'Straat' => 'Leon van Bonstraat', 'Huisnummer' => 213, 'Postcode' => '145XC', 'Stad' => 'Lunteren', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 6, 'Straat' => 'Bea van Lingenlaan', 'Huisnummer' => 234, 'Postcode' => '2197FG', 'Stad' => 'Sint Pancras', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+        ]);
 
         // 1. Producten
         DB::table('Product')->insert([
@@ -36,14 +47,14 @@ class JaminSeeder extends Seeder
             ['Id' => 13, 'Naam' => 'Zoute Ruitjes', 'Barcode' => '8719587323256', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
         ]);
 
-        // 2. Leveranciers
+        // 2. Leveranciers (inclusief ContactId)
         DB::table('Leverancier')->insert([
-            ['Id' => 1, 'Naam' => 'Venco', 'ContactPersoon' => 'Bert van Linge', 'LeverancierNummer' => 'L1029384719', 'Mobiel' => '06-28493827', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
-            ['Id' => 2, 'Naam' => 'Astra Sweets', 'ContactPersoon' => 'Jasper del Monte', 'LeverancierNummer' => 'L1029284315', 'Mobiel' => '06-39398734', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
-            ['Id' => 3, 'Naam' => 'Haribo', 'ContactPersoon' => 'Sven Stalman', 'LeverancierNummer' => 'L1029324748', 'Mobiel' => '06-24383291', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
-            ['Id' => 4, 'Naam' => 'Basset', 'ContactPersoon' => 'Joyce Stelterberg', 'LeverancierNummer' => 'L1023845773', 'Mobiel' => '06-48293823', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
-            ['Id' => 5, 'Naam' => 'De Bron', 'ContactPersoon' => 'Remco Veenstra', 'LeverancierNummer' => 'L1023857736', 'Mobiel' => '06-34291234', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
-            ['Id' => 6, 'Naam' => 'Quality Street', 'ContactPersoon' => 'Johan Nooij', 'LeverancierNummer' => 'L1029234586', 'Mobiel' => '06-23458456', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 1, 'ContactId' => 1, 'Naam' => 'Venco', 'ContactPersoon' => 'Bert van Linge', 'LeverancierNummer' => 'L1029384719', 'Mobiel' => '06-28493827', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 2, 'ContactId' => 2, 'Naam' => 'Astra Sweets', 'ContactPersoon' => 'Jasper del Monte', 'LeverancierNummer' => 'L1029284315', 'Mobiel' => '06-39398734', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 3, 'ContactId' => 3, 'Naam' => 'Haribo', 'ContactPersoon' => 'Sven Stalman', 'LeverancierNummer' => 'L1029324748', 'Mobiel' => '06-24383291', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 4, 'ContactId' => 4, 'Naam' => 'Basset', 'ContactPersoon' => 'Joyce Stelterberg', 'LeverancierNummer' => 'L1023845773', 'Mobiel' => '06-48293823', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 5, 'ContactId' => 5, 'Naam' => 'De Bron', 'ContactPersoon' => 'Remco Veenstra', 'LeverancierNummer' => 'L1023857736', 'Mobiel' => '06-34291234', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 6, 'ContactId' => 6, 'Naam' => 'Quality Street', 'ContactPersoon' => 'Johan Nooij', 'LeverancierNummer' => 'L1029234586', 'Mobiel' => '06-23458456', 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
         ]);
 
         // 3. Allergenen
@@ -66,7 +77,7 @@ class JaminSeeder extends Seeder
             ['Id' => 7, 'ProductId' => 7, 'VerpakkingsEenheid' => 1.0, 'AantalAanwezig' => 795, 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
             ['Id' => 8, 'ProductId' => 8, 'VerpakkingsEenheid' => 10.0, 'AantalAanwezig' => 233, 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
             ['Id' => 9, 'ProductId' => 9, 'VerpakkingsEenheid' => 2.5, 'AantalAanwezig' => 123, 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
-            ['Id' => 10, 'ProductId' => 10, 'VerpakkingsEenheid' => 3.0, 'AantalAanwezig' => null, 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
+            ['Id' => 10, 'ProductId' => 10, 'VerpakkingsEenheid' => 3.0, 'AantalAanwezig' => null, 'IsActief' => 0, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
             ['Id' => 11, 'ProductId' => 11, 'VerpakkingsEenheid' => 2.0, 'AantalAanwezig' => 367, 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
             ['Id' => 12, 'ProductId' => 12, 'VerpakkingsEenheid' => 1.0, 'AantalAanwezig' => 467, 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],
             ['Id' => 13, 'ProductId' => 13, 'VerpakkingsEenheid' => 5.0, 'AantalAanwezig' => 20, 'IsActief' => 1, 'Opmerking' => null, 'DatumAangemaakt' => now(), 'DatumGewijzigd' => now()],

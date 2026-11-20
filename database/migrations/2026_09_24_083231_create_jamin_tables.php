@@ -11,6 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('Contact', function (Blueprint $table) {
+            $table->increments('Id');
+            $table->string('Straat', 100);
+            $table->integer('Huisnummer');
+            $table->string('Postcode', 10);
+            $table->string('Stad', 100);
+            $table->boolean('IsActief')->default(true);
+            $table->string('Opmerking', 250)->nullable();
+            $table->dateTime('DatumAangemaakt')->useCurrent();
+            $table->dateTime('DatumGewijzigd')->useCurrent();
+        });
+
         Schema::create('Product', function (Blueprint $table) {
             $table->increments('Id');
             $table->string('Naam', 100);
@@ -23,6 +35,7 @@ return new class extends Migration
 
         Schema::create('Leverancier', function (Blueprint $table) {
             $table->increments('Id');
+            $table->unsignedInteger('ContactId')->nullable();
             $table->string('Naam', 100);
             $table->string('ContactPersoon', 100);
             $table->string('LeverancierNummer', 20);
@@ -31,6 +44,8 @@ return new class extends Migration
             $table->string('Opmerking', 250)->nullable();
             $table->dateTime('DatumAangemaakt')->useCurrent();
             $table->dateTime('DatumGewijzigd')->useCurrent();
+
+            $table->foreign('ContactId')->references('Id')->on('Contact')->onDelete('set null')->onUpdate('cascade');
         });
 
         Schema::create('Allergeen', function (Blueprint $table) {
@@ -96,6 +111,7 @@ return new class extends Migration
         Schema::dropIfExists('Magazijn');
         Schema::dropIfExists('Allergeen');
         Schema::dropIfExists('Leverancier');
+        Schema::dropIfExists('Contact');
         Schema::dropIfExists('Product');
     }
 };
