@@ -18,6 +18,28 @@ USE Jamin;
 
 -- Step : 02.1
 /*********************************************************************************
+-- Doel : Maak een nieuwe tabel aan heet Contact (BE-opdracht 03).
+-- *******************************************************************************
+-- Versie     Datum          Auteur			Omschrijving
+-- ******     **********     **********		**************
+-- 01         20-11-2026     YousufzaiS		CREATE TABLE Contact gemaakt (Stamtabel)	 
+**********************************************************************************/ 
+CREATE TABLE Contact 
+(
+     Id                  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY
+    ,Straat              VARCHAR(100) NOT NULL
+    ,Huisnummer          INT NOT NULL
+    ,Postcode            VARCHAR(10) NOT NULL
+    ,Stad                VARCHAR(100) NOT NULL
+    ,IsActief            BIT NOT NULL DEFAULT 1
+    ,Opmerking           VARCHAR(250) NULL DEFAULT NULL
+    ,DatumAangemaakt     DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
+    ,DatumGewijzigd      DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+);
+
+
+-- Step : 02.2
+/*********************************************************************************
 -- Doel : Maak een nieuwe tabel aan heet Product.
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
@@ -36,17 +58,19 @@ CREATE TABLE Product
 );
 
 
--- Step : 02.2
+-- Step : 02.3
 /*********************************************************************************
 -- Doel : Maak een nieuwe tabel aan heet Leverancier.
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     YousufzaiS		CREATE TABLE Leverancier gemaakt (Stamtabel)	 
+-- 01         13-09-2026     YousufzaiS		CREATE TABLE Leverancier gemaakt
+-- 02         20-11-2026     YousufzaiS		ContactId toegevoegd met FK naar Contact
 **********************************************************************************/ 
 CREATE TABLE Leverancier 
 (
      Id                  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY
+    ,ContactId           INT UNSIGNED NULL DEFAULT NULL
     ,Naam                VARCHAR(100) NOT NULL
     ,ContactPersoon      VARCHAR(100) NOT NULL
     ,LeverancierNummer   VARCHAR(20) NOT NULL
@@ -55,10 +79,11 @@ CREATE TABLE Leverancier
     ,Opmerking           VARCHAR(250) NULL DEFAULT NULL
     ,DatumAangemaakt     DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
     ,DatumGewijzigd      DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
+    ,CONSTRAINT FK_Leverancier_ContactId FOREIGN KEY (ContactId) REFERENCES Contact(Id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 
--- Step : 02.3
+-- Step : 02.4
 /*********************************************************************************
 -- Doel : Maak een nieuwe tabel aan heet Allergeen.
 -- *******************************************************************************
@@ -157,6 +182,34 @@ CREATE TABLE ProductPerLeverancier
 
 -- Step : 04.1
 /*********************************************************************************
+-- Doel : Voeg 6 rijen toe met INSERT aan tabel Contact (BE-opdracht 03)
+-- *******************************************************************************
+-- Versie     Datum          Auteur			Omschrijving
+-- ******     **********     **********		**************
+-- 01         20-11-2026     YousufzaiS		6 rijen ingevoegd in Contact
+**********************************************************************************/ 
+INSERT INTO Contact
+(
+     Id
+    ,Straat
+    ,Huisnummer
+    ,Postcode
+    ,Stad
+    ,IsActief
+    ,Opmerking
+    ,DatumAangemaakt
+    ,DatumGewijzigd
+)
+VALUES (1, 'Van Gilslaan', 34, '1045CB', 'Hilvarenbeek', 1, NULL, NOW(6), NOW(6))
+      ,(2, 'Den Dolderpad', 2, '1067RC', 'Utrecht', 1, NULL, NOW(6), NOW(6))
+      ,(3, 'Fredo Raalteweg', 257, '1236OP', 'Nijmegen', 1, NULL, NOW(6), NOW(6))
+      ,(4, 'Bertrand Russellhof', 21, '2034AP', 'Den Haag', 1, NULL, NOW(6), NOW(6))
+      ,(5, 'Leon van Bonstraat', 213, '145XC', 'Lunteren', 1, NULL, NOW(6), NOW(6))
+      ,(6, 'Bea van Lingenlaan', 234, '2197FG', 'Sint Pancras', 1, NULL, NOW(6), NOW(6));
+
+
+-- Step : 04.2
+/*********************************************************************************
 -- Doel : Voeg 13 rijen toe met INSERT aan tabel Product
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
@@ -188,17 +241,18 @@ VALUES (1, 'Mintnopjes', '8719587231278', 1, NULL, NOW(6), NOW(6))
       ,(13, 'Zoute Ruitjes', '8719587323256', 1, NULL, NOW(6), NOW(6));
 
 
--- Step : 04.2
+-- Step : 04.3
 /*********************************************************************************
--- Doel : Voeg 5 rijen toe met INSERT aan tabel Leverancier
+-- Doel : Voeg 6 rijen toe met INSERT aan tabel Leverancier (inclusief ContactId)
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     YousufzaiS		5 rijen gevoegd met insert aan tabel Leverancier 
+-- 01         13-09-2026     YousufzaiS		6 rijen gevoegd met insert aan tabel Leverancier 
 **********************************************************************************/ 
 INSERT INTO Leverancier
 (
      Id
+    ,ContactId
     ,Naam
     ,ContactPersoon
     ,LeverancierNummer
@@ -208,15 +262,15 @@ INSERT INTO Leverancier
     ,DatumAangemaakt
     ,DatumGewijzigd
 )
-VALUES (1, 'Venco', 'Bert van Linge', 'L1029384719', '06-28493827', 1, NULL, NOW(6), NOW(6))
-      ,(2, 'Astra Sweets', 'Jasper del Monte', 'L1029284315', '06-39398734', 1, NULL, NOW(6), NOW(6))
-      ,(3, 'Haribo', 'Sven Stalman', 'L1029324748', '06-24383291', 1, NULL, NOW(6), NOW(6))
-      ,(4, 'Basset', 'Joyce Stelterberg', 'L1023845773', '06-48293823', 1, NULL, NOW(6), NOW(6))
-      ,(5, 'De Bron', 'Remco Veenstra', 'L1023857736', '06-34291234', 1, NULL, NOW(6), NOW(6))
-      ,(6, 'Quality Street', 'Johan Nooij', 'L1029234586', '06-23458456', 1, NULL, NOW(6), NOW(6));
+VALUES (1, 1, 'Venco', 'Bert van Linge', 'L1029384719', '06-28493827', 1, NULL, NOW(6), NOW(6))
+      ,(2, 2, 'Astra Sweets', 'Jasper del Monte', 'L1029284315', '06-39398734', 1, NULL, NOW(6), NOW(6))
+      ,(3, 3, 'Haribo', 'Sven Stalman', 'L1029324748', '06-24383291', 1, NULL, NOW(6), NOW(6))
+      ,(4, 4, 'Basset', 'Joyce Stelterberg', 'L1023845773', '06-48293823', 1, NULL, NOW(6), NOW(6))
+      ,(5, 5, 'De Bron', 'Remco Veenstra', 'L1023857736', '06-34291234', 1, NULL, NOW(6), NOW(6))
+      ,(6, 6, 'Quality Street', 'Johan Nooij', 'L1029234586', '06-23458456', 1, NULL, NOW(6), NOW(6));
 
 
--- Step : 04.3
+-- Step : 04.4
 /*********************************************************************************
 -- Doel : Voeg 5 rijen toe met INSERT aan tabel Allergeen
 -- *******************************************************************************
@@ -241,13 +295,13 @@ VALUES (1, 'Gluten', 'Dit product bevat gluten', 1, NULL, NOW(6), NOW(6))
       ,(5, 'Soja', 'Dit product bevat soja', 1, NULL, NOW(6), NOW(6));
 
 
--- Step : 04.4
+-- Step : 04.5
 /*********************************************************************************
 -- Doel : Voeg 13 rijen toe met INSERT aan tabel Magazijn
 -- *******************************************************************************
 -- Versie     Datum          Auteur			Omschrijving
 -- ******     **********     **********		**************
--- 01         13-09-2026     YousufzaiS		13 rijen gevoegd met insert aan tabel Magazijn (rij 10 heeft NULL voorraad) 
+-- 01         13-09-2026     YousufzaiS		13 rijen gevoegd met insert aan tabel Magazijn 
 **********************************************************************************/ 
 INSERT INTO Magazijn
 (
@@ -275,7 +329,7 @@ VALUES (1, 1, 5.0, 453, 1, NULL, NOW(6), NOW(6))
       ,(13, 13, 5.0, 20, 1, NULL, NOW(6), NOW(6));
 
 
--- Step : 04.5
+-- Step : 04.6
 /*********************************************************************************
 -- Doel : Voeg 12 rijen toe met INSERT aan koppeltabel ProductPerAllergeen
 -- *******************************************************************************
@@ -307,7 +361,7 @@ VALUES (1, 1, 2, 1, NULL, NOW(6), NOW(6))
       ,(12, 13, 5, 1, NULL, NOW(6), NOW(6));
 
 
--- Step : 04.6
+-- Step : 04.7
 /*********************************************************************************
 -- Doel : Voeg 17 rijen toe met INSERT aan koppeltabel ProductPerLeverancier
 -- *******************************************************************************
@@ -348,21 +402,13 @@ VALUES (1, 1, 1, '2024-10-09', 23, '2024-10-16', 1, NULL, NOW(6), NOW(6))
 
 
 -- ==============================================================================
--- DEEL 5: STORED PROCEDURES (Opdracht 2)
+-- DEEL 4: STORED PROCEDURES
 -- ==============================================================================
 
--- Step : 06.1
-/*********************************************************************************
--- Doel : Stored procedure sp_GetLeveranciersOverzicht
---        Geeft alle leveranciers terug gesorteerd op aantal verschillende
---        producten DESC (meeste leveringen bovenaan).
--- *******************************************************************************
--- Versie     Datum          Auteur          Omschrijving
--- ******     **********     **********      **************
--- 01         29-10-2026     YousufzaiS      sp_GetLeveranciersOverzicht aangemaakt
-**********************************************************************************/
 DELIMITER $$
 
+-- 1. Leveranciers overzicht gesorteerd op aantal verschillende producten DESC
+DROP PROCEDURE IF EXISTS sp_GetLeveranciersOverzicht$$
 CREATE PROCEDURE sp_GetLeveranciersOverzicht()
 BEGIN
     SELECT l.Id,
@@ -377,21 +423,8 @@ BEGIN
     ORDER BY AantalVerschillendeProducten DESC;
 END$$
 
-DELIMITER ;
-
-
--- Step : 06.2
-/*********************************************************************************
--- Doel : Stored procedure sp_GetGeleverdeProdPerLeverancier
---        Geeft alle producten die een leverancier heeft geleverd, met voorraad
---        en datum van laatste levering, gesorteerd op AantalAanwezig DESC.
--- *******************************************************************************
--- Versie     Datum          Auteur          Omschrijving
--- ******     **********     **********      **************
--- 01         29-10-2026     YousufzaiS      sp_GetGeleverdeProdPerLeverancier aangemaakt
-**********************************************************************************/
-DELIMITER $$
-
+-- 2. Geleverde producten per leverancier
+DROP PROCEDURE IF EXISTS sp_GetGeleverdeProdPerLeverancier$$
 CREATE PROCEDURE sp_GetGeleverdeProdPerLeverancier(IN p_LeverancierId INT)
 BEGIN
     SELECT p.Id                  AS ProductId,
@@ -408,22 +441,8 @@ BEGIN
     ORDER BY m.AantalAanwezig DESC;
 END$$
 
-DELIMITER ;
-
-
--- Step : 06.3
-/*********************************************************************************
--- Doel : Stored procedure sp_SlaLeveringOp
---        Voegt een nieuwe levering in ProductPerLeverancier in en werkt
---        de voorraad in Magazijn bij. Controleert NIET op IsActief hier —
---        validatie vindt plaats in de applicatielaag vóór aanroep.
--- *******************************************************************************
--- Versie     Datum          Auteur          Omschrijving
--- ******     **********     **********      **************
--- 01         29-10-2026     YousufzaiS      sp_SlaLeveringOp aangemaakt
-**********************************************************************************/
-DELIMITER $$
-
+-- 3. Levering opslaan en voorraad bijwerken
+DROP PROCEDURE IF EXISTS sp_SlaLeveringOp$$
 CREATE PROCEDURE sp_SlaLeveringOp(
     IN p_LeverancierId          INT,
     IN p_ProductId              INT,
@@ -431,7 +450,6 @@ CREATE PROCEDURE sp_SlaLeveringOp(
     IN p_DatumEerstVolgende     DATE
 )
 BEGIN
-    -- Voeg nieuwe leveringsregel in
     INSERT INTO ProductPerLeverancier
     (
          LeverancierId
@@ -455,31 +473,14 @@ BEGIN
         ,NOW(6)
     );
 
-    -- Bijwerken van voorraad; gebruik COALESCE zodat NULL als 0 telt
     UPDATE Magazijn
     SET AantalAanwezig = COALESCE(AantalAanwezig, 0) + p_Aantal,
         DatumGewijzigd = NOW(6)
     WHERE ProductId = p_ProductId;
 END$$
 
-DELIMITER ;
-
-
--- ==============================================================================
--- DEEL 6: STORED PROCEDURES (Opdracht 1: Magazijn, Levering & Allergeen)
--- ==============================================================================
-
--- Step : 07.1
-/*********************************************************************************
--- Doel : Stored procedure sp_GetMagazijnOverzicht
---        Haalt alle actieve producten op met voorraad gesorteerd op Barcode ASC.
--- *******************************************************************************
--- Versie     Datum          Auteur          Omschrijving
--- ******     **********     **********      **************
--- 01         05-11-2026     YousufzaiS      sp_GetMagazijnOverzicht aangemaakt
-**********************************************************************************/
-DELIMITER $$
-
+-- 4. Magazijn overzicht
+DROP PROCEDURE IF EXISTS sp_GetMagazijnOverzicht$$
 CREATE PROCEDURE sp_GetMagazijnOverzicht()
 BEGIN
     SELECT p.Id,
@@ -493,20 +494,8 @@ BEGIN
     ORDER BY p.Barcode ASC;
 END$$
 
-DELIMITER ;
-
-
--- Step : 07.2
-/*********************************************************************************
--- Doel : Stored procedure sp_GetLeveringDetails
---        Haalt leveringen en leveranciergegevens op voor een specifiek product.
--- *******************************************************************************
--- Versie     Datum          Auteur          Omschrijving
--- ******     **********     **********      **************
--- 01         05-11-2026     YousufzaiS      sp_GetLeveringDetails aangemaakt
-**********************************************************************************/
-DELIMITER $$
-
+-- 5. Levering details per product
+DROP PROCEDURE IF EXISTS sp_GetLeveringDetails$$
 CREATE PROCEDURE sp_GetLeveringDetails(IN p_ProductId INT)
 BEGIN
     SELECT ppl.Id,
@@ -525,20 +514,8 @@ BEGIN
     ORDER BY ppl.DatumLevering ASC;
 END$$
 
-DELIMITER ;
-
-
--- Step : 07.3
-/*********************************************************************************
--- Doel : Stored procedure sp_GetAllergenenPerProduct
---        Haalt alle allergenen op voor een specifiek product gesorteerd op Naam.
--- *******************************************************************************
--- Versie     Datum          Auteur          Omschrijving
--- ******     **********     **********      **************
--- 01         05-11-2026     YousufzaiS      sp_GetAllergenenPerProduct aangemaakt
-**********************************************************************************/
-DELIMITER $$
-
+-- 6. Allergenen per product
+DROP PROCEDURE IF EXISTS sp_GetAllergenenPerProduct$$
 CREATE PROCEDURE sp_GetAllergenenPerProduct(IN p_ProductId INT)
 BEGIN
     SELECT a.Naam, a.Omschrijving
@@ -546,6 +523,150 @@ BEGIN
     JOIN Allergeen a ON ppa.AllergeenId = a.Id
     WHERE ppa.ProductId = p_ProductId
     ORDER BY a.Naam ASC;
+END$$
+
+-- 7. Leverancier op Id
+DROP PROCEDURE IF EXISTS sp_GetLeverancierById$$
+CREATE PROCEDURE sp_GetLeverancierById(IN p_Id INT)
+BEGIN
+    SELECT * FROM Leverancier WHERE Id = p_Id;
+END$$
+
+-- 8. Product op Id
+DROP PROCEDURE IF EXISTS sp_GetProductById$$
+CREATE PROCEDURE sp_GetProductById(IN p_Id INT)
+BEGIN
+    SELECT p.Id,
+           p.Naam,
+           p.Barcode,
+           p.IsActief,
+           m.AantalAanwezig,
+           m.VerpakkingsEenheid
+    FROM Product p
+    LEFT JOIN Magazijn m ON p.Id = m.ProductId
+    WHERE p.Id = p_Id;
+END$$
+
+-- 9. Product en leverancier details voor formulier
+DROP PROCEDURE IF EXISTS sp_GetProductLeveringDetails$$
+CREATE PROCEDURE sp_GetProductLeveringDetails(IN p_LeverancierId INT, IN p_ProductId INT)
+BEGIN
+    SELECT p.Id AS ProductId,
+           p.Naam AS ProductNaam,
+           p.IsActief AS ProductIsActief,
+           l.Id AS LeverancierId,
+           l.Naam AS LeverancierNaam,
+           l.ContactPersoon,
+           l.Mobiel
+    FROM Product p, Leverancier l
+    WHERE p.Id = p_ProductId AND l.Id = p_LeverancierId;
+END$$
+
+-- 10. BE-Opdracht 03: Leveranciers overzicht met paginering (max 4 per pagina)
+DROP PROCEDURE IF EXISTS sp_GetLeveranciersOverzichtPaginering$$
+CREATE PROCEDURE sp_GetLeveranciersOverzichtPaginering(IN p_Offset INT, IN p_Limit INT)
+BEGIN
+    SELECT l.Id,
+           l.Naam,
+           l.ContactPersoon,
+           l.LeverancierNummer,
+           l.Mobiel
+    FROM Leverancier l
+    ORDER BY l.Id ASC
+    LIMIT p_Limit OFFSET p_Offset;
+END$$
+
+-- 11. BE-Opdracht 03: Totaal aantal leveranciers voor paginering
+DROP PROCEDURE IF EXISTS sp_GetLeveranciersCount$$
+CREATE PROCEDURE sp_GetLeveranciersCount()
+BEGIN
+    SELECT COUNT(*) AS Totaal FROM Leverancier;
+END$$
+
+-- 12. BE-Opdracht 03: Details leverancier inclusief adres (Contact)
+DROP PROCEDURE IF EXISTS sp_GetLeverancierDetailsEnAdres$$
+CREATE PROCEDURE sp_GetLeverancierDetailsEnAdres(IN p_LeverancierId INT)
+BEGIN
+    SELECT l.Id AS LeverancierId,
+           l.Naam,
+           l.ContactPersoon,
+           l.LeverancierNummer,
+           l.Mobiel,
+           c.Id AS ContactId,
+           c.Straat AS Straatnaam,
+           c.Huisnummer,
+           c.Postcode,
+           c.Stad
+    FROM Leverancier l
+    LEFT JOIN Contact c ON l.ContactId = c.Id
+    WHERE l.Id = p_LeverancierId;
+END$$
+
+-- 13. BE-Opdracht 03: Wijzigen leverancier en contactgegevens
+DROP PROCEDURE IF EXISTS sp_UpdateLeverancierEnContact$$
+CREATE PROCEDURE sp_UpdateLeverancierEnContact(
+    IN p_LeverancierId      INT,
+    IN p_Naam               VARCHAR(100),
+    IN p_ContactPersoon     VARCHAR(100),
+    IN p_LeverancierNummer  VARCHAR(20),
+    IN p_Mobiel             VARCHAR(20),
+    IN p_Straatnaam         VARCHAR(100),
+    IN p_Huisnummer         INT,
+    IN p_Postcode           VARCHAR(10),
+    IN p_Stad               VARCHAR(100)
+)
+BEGIN
+    DECLARE v_ContactId INT;
+
+    SELECT ContactId INTO v_ContactId
+    FROM Leverancier
+    WHERE Id = p_LeverancierId;
+
+    UPDATE Leverancier
+    SET Naam = p_Naam,
+        ContactPersoon = p_ContactPersoon,
+        LeverancierNummer = p_LeverancierNummer,
+        Mobiel = p_Mobiel,
+        DatumGewijzigd = NOW(6)
+    WHERE Id = p_LeverancierId;
+
+    IF v_ContactId IS NOT NULL THEN
+        UPDATE Contact
+        SET Straat = p_Straatnaam,
+            Huisnummer = p_Huisnummer,
+            Postcode = p_Postcode,
+            Stad = p_Stad,
+            DatumGewijzigd = NOW(6)
+        WHERE Id = v_ContactId;
+    ELSE
+        INSERT INTO Contact
+        (
+             Straat
+            ,Huisnummer
+            ,Postcode
+            ,Stad
+            ,IsActief
+            ,Opmerking
+            ,DatumAangemaakt
+            ,DatumGewijzigd
+        )
+        VALUES
+        (
+             p_Straatnaam
+            ,p_Huisnummer
+            ,p_Postcode
+            ,p_Stad
+            ,1
+            ,NULL
+            ,NOW(6)
+            ,NOW(6)
+        );
+
+        UPDATE Leverancier
+        SET ContactId = LAST_INSERT_ID(),
+            DatumGewijzigd = NOW(6)
+        WHERE Id = p_LeverancierId;
+    END IF;
 END$$
 
 DELIMITER ;

@@ -58,6 +58,16 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        User::updateOrCreate(
+            ['email' => 'manager@jamin.nl'],
+            [
+                'name' => 'Manager',
+                'role' => 'Manager',
+                'password' => bcrypt('password123'),
+                'email_verified_at' => now(),
+            ]
+        );
+
         $this->call(JaminSeeder::class);
     }
 }
