@@ -3,10 +3,20 @@
 namespace Tests\Unit;
 
 use App\Models\Leverancier;
+use Database\Seeders\JaminSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class LeverancierUnitTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(JaminSeeder::class);
+    }
+
     /**
      * Unit Test 1: Test dat getOverzichtPaginering maximaal het opgegeven limiet aantal records teruggeeft.
      */

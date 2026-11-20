@@ -4,15 +4,20 @@ namespace Tests\Feature;
 
 use App\Models\Leverancier;
 use App\Models\User;
+use Database\Seeders\JaminSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class WijzigenLeverancierTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected User $manager;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(JaminSeeder::class);
 
         $this->manager = User::firstOrCreate(
             ['email' => 'manager@jamin.nl'],
