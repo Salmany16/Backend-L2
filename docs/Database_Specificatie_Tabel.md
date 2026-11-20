@@ -1,15 +1,32 @@
 # Database Specificatie Tabel - Magazijn Jamin
 
-**Opdracht:** BE-opdracht 01  
-**Auteur:** KadhimH  
-**Klas:** IO-SD-2509*  
-**Database:** `Jamin` (en `laravel`)  
+**Opdracht:** BE-opdracht 03  
+**Auteur:** YousufzaiS  
+**Klas:** IO-SD-2509AB  
+**Database:** `Jamin`  
 
 ---
 
 ## 1. Stamtabellen
 
-### 1.1 Tabel: `Product`
+### 1.1 Tabel: `Contact`
+Beschrijving: Bevat de adres- en contactlocatiegegevens van leveranciers (BE-opdracht 03).
+
+| Veldnaam | Datatype | Lengte / Precisie | Nullable | Sleutel | Standaardwaarde | Beschrijving |
+|---|---|---|---|---|---|---|
+| `Id` | INT UNSIGNED | 10 | Nee | PK (Auto Increment) | - | Unieke identifier van het contactadres |
+| `Straat` | VARCHAR | 100 | Nee | - | - | Straatnaam van het leveranciersadres |
+| `Huisnummer` | INT | 10 | Nee | - | - | Huisnummer van het leveranciersadres |
+| `Postcode` | VARCHAR | 10 | Nee | - | - | Postcode (bijv. 1067RC) |
+| `Stad` | VARCHAR | 100 | Nee | - | - | Plaats / vestigingsstad |
+| `IsActief` | BIT | 1 | Nee | - | 1 | Geeft aan of record actief is |
+| `Opmerking` | VARCHAR | 250 | Ja | - | NULL | Optionele opmerkingen |
+| `DatumAangemaakt` | DATETIME | 6 | Nee | - | CURRENT_TIMESTAMP(6) | Tijdstip van creatie record |
+| `DatumGewijzigd` | DATETIME | 6 | Nee | - | CURRENT_TIMESTAMP(6) | Tijdstip van laatste wijziging |
+
+---
+
+### 1.2 Tabel: `Product`
 Beschrijving: Bevat de basisgegevens van alle snoepgoedproducten.
 
 | Veldnaam | Datatype | Lengte / Precisie | Nullable | Sleutel | Standaardwaarde | Beschrijving |
@@ -24,12 +41,13 @@ Beschrijving: Bevat de basisgegevens van alle snoepgoedproducten.
 
 ---
 
-### 1.2 Tabel: `Leverancier`
-Beschrijving: Bevat de contact- en identificatiegegevens van leveranciers.
+### 1.3 Tabel: `Leverancier`
+Beschrijving: Bevat de identificatie- en contactpersoongegevens van leveranciers, gekoppeld aan een adres in `Contact`.
 
 | Veldnaam | Datatype | Lengte / Precisie | Nullable | Sleutel | Standaardwaarde | Beschrijving |
 |---|---|---|---|---|---|---|
 | `Id` | INT UNSIGNED | 10 | Nee | PK (Auto Increment) | - | Unieke identifier van de leverancier |
+| `ContactId` | INT UNSIGNED | 10 | Ja | FK naar `Contact(Id)` | NULL | Referentie naar het adres in `Contact` |
 | `Naam` | VARCHAR | 100 | Nee | - | - | Naam van het leveranciersbedrijf |
 | `ContactPersoon` | VARCHAR | 100 | Nee | - | - | Naam van de vaste contactpersoon |
 | `LeverancierNummer` | VARCHAR | 20 | Nee | - | - | Uniek nummer van de leverancier (bijv. L1029384719) |
@@ -39,9 +57,12 @@ Beschrijving: Bevat de contact- en identificatiegegevens van leveranciers.
 | `DatumAangemaakt` | DATETIME | 6 | Nee | - | CURRENT_TIMESTAMP(6) | Tijdstip van creatie record |
 | `DatumGewijzigd` | DATETIME | 6 | Nee | - | CURRENT_TIMESTAMP(6) | Tijdstip van laatste wijziging |
 
+**Foreign Keys:**
+- `FK_Leverancier_ContactId`: `ContactId` verwijst naar `Contact(Id)` met `ON DELETE SET NULL ON UPDATE CASCADE`.
+
 ---
 
-### 1.3 Tabel: `Allergeen`
+### 1.4 Tabel: `Allergeen`
 Beschrijving: Bevat de lijst met bekende allergenen die in snoepgoed kunnen voorkomen.
 
 | Veldnaam | Datatype | Lengte / Precisie | Nullable | Sleutel | Standaardwaarde | Beschrijving |
